@@ -16,11 +16,8 @@
 // ==============================================================================
 // CONFIGURAÇÕES REVISADAS (FLUXO UFC - GRAFOS)
 // ==============================================================================
-// 1. Caminho do executável de grafos (usando barras invertidas duplas para o sistema)
-#define EXECUTAVEL "C:/Users/faria/OneDrive/Desktop/UFC/Grafos/Trabalho/grafos-agm/main.exe"
-
-// 2. Pasta onde o Scriptcalcular vai ler as instâncias (barras normais '/' evitam erros no C)
-#define PASTA_INSTANCIAS "C:/Users/faria/OneDrive/Desktop/UFC/Grafos/Trabalho/GeradorInstancia/instancias"
+// Removemos as macros EXECUTAVEL e PASTA_INSTANCIAS fixas.
+// Os valores agora são dinâmicos e definidos na main().
 
 // 3. Quantidade de vezes que cada algoritmo roda por arquivo para tirar a média
 #define NUM_EXECUCOES 10
@@ -47,13 +44,17 @@ void capitalizar(char *dest, const char *src) {
     }
 }
 
-int main(void) {
+int main(int argc, char *argv[]) {
     DIR *dir;
     struct dirent *ent;
 
-    // Tenta abrir a pasta do GeradorInstancia
-    if ((dir = opendir(PASTA_INSTANCIAS)) == NULL) {
-        printf("Erro: A pasta de instancias '%s' nao foi encontrada.\n", PASTA_INSTANCIAS);
+    // Se o usuário passar caminhos, usamos eles. Senão, usamos os relativos ao diretório de execução atual.
+    const char *executavel = (argc > 1) ? argv[1] : "../main.exe";
+    const char *pasta_instancias = (argc > 2) ? argv[2] : "../GeradorInstancia/instancias";
+
+    // Tenta abrir a pasta de instâncias
+    if ((dir = opendir(pasta_instancias)) == NULL) {
+        printf("Erro: A pasta de instancias '%s' nao foi encontrada.\n", pasta_instancias);
         return 1;
     }
 
@@ -70,7 +71,8 @@ int main(void) {
 
     printf("==================================================================\n");
     printf(" Iniciando Bateria de Testes Integrada (%dx cada)\n", NUM_EXECUCOES);
-    printf(" Executavel: %s\n", EXECUTAVEL);
+    printf(" Executavel: %s\n", executavel);
+    printf(" Pasta Instancias: %s\n", pasta_instancias);
     printf("==================================================================\n\n");
 
     // Varre a pasta procurando os arquivos .txt das instâncias
@@ -80,7 +82,7 @@ int main(void) {
 
             // Monta o caminho completo da instância usando barras normais
             char caminho_arquivo[1024];
-            snprintf(caminho_arquivo, sizeof(caminho_arquivo), "%s/%s", PASTA_INSTANCIAS, ent->d_name);
+            snprintf(caminho_arquivo, sizeof(caminho_arquivo), "%s/%s", pasta_instancias, ent->d_name);
 
             int v_tamanho = extrair_tamanho(ent->d_name);
 
@@ -99,9 +101,8 @@ int main(void) {
                     char comando[2048];
 
                     // Monta a chamada envolvendo os caminhos em aspas duplas de forma segura para o Windows
-                    snprintf(comando, sizeof(comando), "\"\"%s\" %s \"%s\"\"", EXECUTAVEL, alg, caminho_arquivo);
+                    snprintf(comando, sizeof(comando), "\"\"%s\" %s \"%s\"\"", executavel, alg, caminho_arquivo);
 
-                    // Executa o grafos-agm via Pipe e coleta os textos de saída (printfs)
                     FILE *pipe = POPEN(comando, "r");
                     if (pipe == NULL) {
                         printf(" -> Erro ao invocar o executavel na rodada %d.\n", i + 1);

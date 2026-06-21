@@ -1,8 +1,0 @@
-# depslib dependency file v1.0
-1781969548 source:c:\users\faria\onedrive\desktop\ufc\grafos\trabalho\geradorinstancia\main.c
-	<stdio.h>
-	<stdlib.h>
-	<math.h>
-	<sys/stat.h>
-	<direct.h>
-
