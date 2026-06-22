@@ -341,12 +341,14 @@ Grafo* ler_grafo_de_arquivo(const char* nome_arquivo) {
 
 int main(int argc, char* argv[]) {
     if (argc < 3) {
-        printf("Uso correto: %s <modo: prim|kruskal> <arquivo_instancia.txt>\n", argv[0]);
+        printf("Uso correto: %s <modo: prim|kruskal> <arquivo_instancia.txt> [opcional: print]\n", argv[0]);
         return 1;
     }
 
     char* modo = argv[1];
     char* arquivo_instancia = argv[2];
+    
+    bool deve_imprimir_arestas = (argc >= 4 && strcmp(argv[3], "print") == 0);
 
     clock_t inicio_leitura = clock();
     Grafo* grafo = ler_grafo_de_arquivo(arquivo_instancia);
@@ -378,6 +380,15 @@ int main(int argc, char* argv[]) {
     printf("Tempo de Execucao (%s): %.6f segundos\n", modo, tempo_algoritmo);
     printf("\n=== RESULTADO DA SOLUCAO ===\n");
     printf("Peso Total da AGM: %.4f\n", peso_total);
+    
+    if (deve_imprimir_arestas) {
+        printf("\nArestas pertencentes a AGM:\n");
+        for (int i = 0; i < grafo->num_vertices - 1; i++) {
+            printf("(%d, %d) -> Peso: %.4f\n", agm[i].u, agm[i].v, agm[i].peso);
+        }
+    } else {
+        printf("[Para visualizar as arestas, execute: %s %s %s print]\n", argv[0], modo, arquivo_instancia);
+    }
     
     free(agm);
     liberar_grafo(grafo);
