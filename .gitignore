@@ -1,0 +1,7 @@
+*.exe
+*.o
+*.out
+bin/
+obj/
+temp_*
+debug_*
